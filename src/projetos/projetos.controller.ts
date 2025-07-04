@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { ProjetosService } from './projetos.service';
 import { CreateProjetoDto } from './dto/create-projeto.dto';
@@ -34,6 +36,16 @@ export class ProjetosController {
   @Get('id/:id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.projetosService.findOne(id);
+  }
+
+  @Get('buscar')
+  async findByName(@Query('nome') nome: string) {
+    if (!nome || nome.trim() === '') {
+      throw new BadRequestException('Parâmetro de busca "nome" é obrigatório.');
+    }
+    // Exemplo de busca: GET /projetos/buscar?nome=tech Isso retornará todos os parceiros cujo nome contenha "tech"
+
+    return this.projetosService.findByName(nome);
   }
 
   @Patch(':id')

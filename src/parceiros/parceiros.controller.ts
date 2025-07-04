@@ -38,14 +38,6 @@ export class ParceirosController {
     return this.parceirosService.findOne(id);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateParceiroDto: UpdateParceiroDto,
-  ) {
-    return this.parceirosService.update(id, updateParceiroDto);
-  }
-
   @Get('buscar')
   async findByName(@Query('nome') nome: string) {
     if (!nome || nome.trim() === '') {
@@ -54,6 +46,14 @@ export class ParceirosController {
     // Exemplo de busca: GET /parceiros/buscar?nome=tech Isso retornará todos os parceiros cujo nome contenha "tech"
 
     return this.parceirosService.findByName(nome);
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateParceiroDto: UpdateParceiroDto,
+  ) {
+    return this.parceirosService.update(id, updateParceiroDto);
   }
 
   @Delete(':id')

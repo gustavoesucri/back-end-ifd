@@ -8,7 +8,7 @@ import { CreateProjetoDto } from './dto/create-projeto.dto';
 import { UpdateProjetoDto } from './dto/update-projeto.dto';
 import { ProjetoEntity } from './entities/projeto.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import slugify from 'slugify';
 
 @Injectable()
@@ -84,6 +84,27 @@ export class ProjetosService {
       }
       throw new InternalServerErrorException(
         `Erro ao buscar Projeto com ID ${id} no Banco de Dados.`,
+      );
+    }
+  }
+
+  async findByName(name: string) {
+    try {
+      const projetos = await this.projetoRepository.find({
+        where: { nomeProjeto: ILike(`%${name}%`) }, // Usando ILike, pois Like é case-sensitive no PostgreSQL.
+      });
+
+      if (projetos.length === 0) {
+        throw new NotFoundException(
+          `Nenhum projeto encontrado com nome semelhante a '${name}'.`,
+        );
+      }
+
+      return projetos;
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException(
+        `Erro ao buscar Projetos com nome semelhante a '${name}'.`,
       );
     }
   }

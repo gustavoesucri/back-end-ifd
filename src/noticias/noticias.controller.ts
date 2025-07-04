@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { NoticiasService } from './noticias.service';
 import { CreateNoticiaDto } from './dto/create-noticia.dto';
@@ -34,6 +36,16 @@ export class NoticiasController {
   @Get('id/:id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.noticiasService.findOne(id);
+  }
+
+  @Get('buscar')
+  async findByName(@Query('nome') nome: string) {
+    if (!nome || nome.trim() === '') {
+      throw new BadRequestException('Parâmetro de busca "nome" é obrigatório.');
+    }
+    // Exemplo de busca: GET /noticias/buscar?nome=tech Isso retornará todos as notícias cujo nome contenha "tech"
+
+    return this.noticiasService.findByName(nome);
   }
 
   @Patch(':id')

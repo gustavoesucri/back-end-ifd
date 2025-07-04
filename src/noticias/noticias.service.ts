@@ -8,7 +8,7 @@ import { CreateNoticiaDto } from './dto/create-noticia.dto';
 import { UpdateNoticiaDto } from './dto/update-noticia.dto';
 import { NoticiaEntity } from './entities/noticia.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import slugify from 'slugify';
 
 @Injectable()
@@ -84,6 +84,27 @@ export class NoticiasService {
       }
       throw new InternalServerErrorException(
         `Erro ao buscar Notícia com ID ${id} no Banco de Dados.`,
+      );
+    }
+  }
+
+  async findByName(name: string) {
+    try {
+      const noticias = await this.noticiaRepository.find({
+        where: { nomeNoticia: ILike(`%${name}%`) }, // Usando ILike, pois Like é case-sensitive no PostgreSQL.
+      });
+
+      if (noticias.length === 0) {
+        throw new NotFoundException(
+          `Nenhuma notícia encontrada com nome semelhante a '${name}'.`,
+        );
+      }
+
+      return noticias;
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException(
+        `Erro ao buscar Notícias com nome semelhante a '${name}'.`,
       );
     }
   }

@@ -43,7 +43,7 @@ export class ProjetosController {
     if (!nome || nome.trim() === '') {
       throw new BadRequestException('Parâmetro de busca "nome" é obrigatório.');
     }
-    // Exemplo de busca: GET /projetos/buscar?nome=tech Isso retornará todos os parceiros cujo nome contenha "tech"
+    // Exemplo de busca: GET /projetos/buscar?nome=tech Isso retornará todos os projetos cujo nome contenha "tech"
 
     return this.projetosService.findByName(nome);
   }

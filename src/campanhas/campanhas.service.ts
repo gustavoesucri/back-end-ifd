@@ -8,7 +8,7 @@ import { CreateCampanhaDto } from './dto/create-campanha.dto';
 import { UpdateCampanhaDto } from './dto/update-campanha.dto';
 import { CampanhaEntity } from './entities/campanha.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import slugify from 'slugify';
 
 @Injectable()
@@ -84,6 +84,27 @@ export class CampanhasService {
       }
       throw new InternalServerErrorException(
         `Erro ao buscar Campanha com ID ${id} no Banco de Dados.`,
+      );
+    }
+  }
+
+  async findByName(name: string) {
+    try {
+      const campanhas = await this.campanhaRepository.find({
+        where: { nomeCampanha: ILike(`%${name}%`) }, // Usando ILike, pois Like é case-sensitive no PostgreSQL.
+      });
+
+      if (campanhas.length === 0) {
+        throw new NotFoundException(
+          `Nenhuma campanha encontrada com nome semelhante a '${name}'.`,
+        );
+      }
+
+      return campanhas;
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException(
+        `Erro ao buscar Campanhas com nome semelhante a '${name}'.`,
       );
     }
   }

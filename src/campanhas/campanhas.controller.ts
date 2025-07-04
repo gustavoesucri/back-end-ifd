@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { CampanhasService } from './campanhas.service';
 import { CreateCampanhaDto } from './dto/create-campanha.dto';
@@ -34,6 +36,16 @@ export class CampanhasController {
   @Get('id/:id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.campanhasService.findOne(id);
+  }
+
+  @Get('buscar')
+  async findByName(@Query('nome') nome: string) {
+    if (!nome || nome.trim() === '') {
+      throw new BadRequestException('Parâmetro de busca "nome" é obrigatório.');
+    }
+    // Exemplo de busca: GET /campanhas/buscar?nome=tech Isso retornará todos as campanhas cujo nome contenha "tech"
+
+    return this.campanhasService.findByName(nome);
   }
 
   @Patch(':id')
